@@ -1,0 +1,27 @@
+//$o-ft-header-secondary-left-width: 302px;
+//$o-ft-header-primary-left-width: 303px;
+@import "o-ft-header/main";
+
+.next-nav__header-search {
+	margin: 0;
+	padding: 0;
+	display: inline-block;
+	vertical-align: middle;
+
+	input {
+		width: 100%;
+		border: 1px solid #cccccc;
+		padding: 8px 4px 4px 22px;
+		font-size: 16px;
+		line-height: 16px;
+		font-family: BentonSans;
+		background: #ffffff url(http://image.webservices.ft.com/v1/images/raw/fticon:search?source=docs&tint=fffff) 5px center no-repeat;
+		background-size: 16px;
+	}
+}
+
+
+// HACK
+.o-ft-header__nav--primary-theme [data-o-hierarchical-nav-level='1']>li>a {
+	text-transform: initial !important;
+}

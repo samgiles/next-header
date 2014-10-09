@@ -1,5 +1,9 @@
-//$o-ft-header-secondary-left-width: 302px;
-//$o-ft-header-primary-left-width: 303px;
+@import "o-assets/main";
+
+@include oAssetsSetModulePaths((
+	o-ft-icons: '//build.origami.ft.com/files/o-ft-icons'
+));
+
 @import "o-ft-header/main";
 
 .next-nav__header-search {

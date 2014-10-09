@@ -1,7 +1,8 @@
 {
   "name": "next-header",
   "dependencies": {
-    "o-ft-header": "~2.5.10"
+    "o-ft-header": "~2.5.10",
+    "o-assets": "~0.4.4"
   },
   "main": [
     "main.scss"

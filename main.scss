@@ -1,6 +1,7 @@
 @import "o-assets/main";
 
 @include oAssetsSetModulePaths((
+	o-ft-header: '//build.origami.ft.com/files/o-ft-header',
 	o-ft-icons: '//build.origami.ft.com/files/o-ft-icons'
 ));
 

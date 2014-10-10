@@ -44,3 +44,11 @@ i.demo__icon {
 .demo__icon__search {
   @extend %o-ft-icons-icon--search;
 }
+
+.demo__icon__menu {
+  @extend %o-ft-icons-icon--hamburger;
+}
+
+.demo__icon__myft {
+  @extend %o-ft-icons-icon--profile;
+}

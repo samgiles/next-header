@@ -30,3 +30,17 @@
 .o-ft-header__nav--primary-theme [data-o-hierarchical-nav-level='1']>li>a {
 	text-transform: initial !important;
 }
+
+@include oFtIconsFontFace();
+
+i.demo__icon {
+  @include oFtIconsBaseIconStyles();
+  display: block;
+  font-size: 20px;
+  line-height: 30px;
+  color: #ffffff;
+}
+
+.demo__icon__search {
+  @extend %o-ft-icons-icon--search;
+}

@@ -1,7 +1,5 @@
-@include oFontsInclude(Metric, normal);
-
 .o-header {
-	font-family: oFontsGetFontFamilyWithFallbacks(Metric);
+	font-family: oFontsGetFontFamilyWithFallbacks(BentonSans);
 
 	* {
 		box-sizing: border-box;

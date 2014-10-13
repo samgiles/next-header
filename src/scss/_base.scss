@@ -2,17 +2,25 @@
 
 .o-header {
 	font-family: oFontsGetFontFamilyWithFallbacks(Metric);
-	background: #333;
 
 	* {
 		box-sizing: border-box;
 	}
 }
 
-.o-header__container {
+.o-header__container--primary > *,
+.o-header__container--secondary > * {
 	@extend %o-grid-row;
 	@extend %o-grid-col;
 	@extend %o-grid-colspan-12;
+}
+
+.o-header__container--primary {
+	background: #333;
+}
+
+.o-header__container--secondary {
+	background: purple;
 }
 
 .o-header__left,

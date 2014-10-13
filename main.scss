@@ -5,7 +5,7 @@
 ));
 
 @import "o-fonts/main";
-@include oFontsInclude(Metric, normal);
+@include oFontsInclude(BentonSans, normal);
 @import "o-ft-icons/main";
 @import "o-grid/main";
 $o-ft-forms-is-silent: false;

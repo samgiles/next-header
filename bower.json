@@ -3,7 +3,8 @@
   "dependencies": {
     "o-fonts": "~1.4.2",
     "o-grid": "~2.2.0",
-    "o-ft-icons": "~2.2.3"
+    "o-ft-icons": "~2.2.3",
+    "o-assets": "~0.4.5"
   },
   "main": [
     "main.scss"

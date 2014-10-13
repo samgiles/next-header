@@ -1,0 +1,27 @@
+.o-header__container--secondary {
+	background: #AAAAAA;
+}
+
+.o-header__secondary {
+	text-align: center;
+	padding: 4px 4px 4px 68px;
+	display: none;
+}
+
+.o-header__secondary--search {
+	.o-header[data-panel=search] & {
+		display: block;	
+	}
+}
+
+.o-header__secondary--myft {
+	.o-header[data-panel=myft] & {
+		display: block;	
+	}
+}
+
+.o-header__secondary--menu {
+	.o-header[data-panel=menu] & {
+		display: block;	
+	}
+}

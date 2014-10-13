@@ -33,3 +33,10 @@ $o-ft-forms-is-silent: false;
 .icon__myft {
 	@extend %o-ft-icons-icon--profile;
 }
+
+// HACK
+.o-header .o-ft-forms__suffix {
+	background: #333333;
+	color: #FFFFFF;
+	border: transparent;
+}

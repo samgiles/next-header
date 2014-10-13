@@ -1,13 +1,14 @@
-@import "o-fonts/main";
-@import "o-ft-icons/main";
-@import "o-grid/main";
 @import "o-assets/main";
-$o-ft-forms-is-silent: false;
-@import "o-ft-forms/main";
 
 @include oAssetsSetModulePaths((
 	o-ft-icons: '//build.origami.ft.com/files/o-ft-icons'
 ));
+
+@import "o-fonts/main";
+@import "o-ft-icons/main";
+@import "o-grid/main";
+$o-ft-forms-is-silent: false;
+@import "o-ft-forms/main";
 
 @import "src/scss/base";
 @import "src/scss/primary";

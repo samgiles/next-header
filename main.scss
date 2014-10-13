@@ -1,54 +1,25 @@
-@import "o-assets/main";
+@import "o-fonts/main";
+@import "o-ft-icons/main";
+@import "o-grid/main";
 
-@include oAssetsSetModulePaths((
-	o-ft-header: '//build.origami.ft.com/files/o-ft-header',
-	o-ft-icons: '//build.origami.ft.com/files/o-ft-icons'
-));
-
-@import "o-ft-header/main";
-
-.next-nav__header-search {
-	margin: 0;
-	padding: 0;
-	display: inline-block;
-	vertical-align: middle;
-
-	input {
-		width: 100%;
-		border: 1px solid #cccccc;
-		padding: 8px 4px 4px 22px;
-		font-size: 16px;
-		line-height: 16px;
-		font-family: BentonSans;
-		background: #ffffff url(//image.webservices.ft.com/v1/images/raw/fticon:search?source=docs&tint=fffff) 5px center no-repeat;
-		background-size: 16px;
-	}
-}
-
-
-// HACK
-.o-ft-header__nav--primary-theme [data-o-hierarchical-nav-level='1']>li>a {
-	text-transform: initial !important;
-}
+@import "src/scss/base";
+@import "src/scss/primary";
+@import "src/scss/logo";
+@import "src/scss/nav";
 
 @include oFtIconsFontFace();
 
-i.demo__icon {
-  @include oFtIconsBaseIconStyles();
-  display: block;
-  font-size: 20px;
-  line-height: 30px;
-  color: #ffffff;
+.icon {
+	@include oFtIconsBaseIconStyles();
+}
+.icon__search {
+	@extend %o-ft-icons-icon--search;
 }
 
-.demo__icon__search {
-  @extend %o-ft-icons-icon--search;
+.icon__menu {
+	@extend %o-ft-icons-icon--hamburger;
 }
 
-.demo__icon__menu {
-  @extend %o-ft-icons-icon--hamburger;
-}
-
-.demo__icon__myft {
-  @extend %o-ft-icons-icon--profile;
+.icon__myft {
+	@extend %o-ft-icons-icon--search;
 }

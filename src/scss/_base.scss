@@ -1,0 +1,22 @@
+@include oFontsInclude(Metric, normal);
+
+.o-header {
+	font-family: oFontsGetFontFamilyWithFallbacks(Metric);
+	background: #333;
+
+	* {
+		box-sizing: border-box;
+	}
+}
+
+.o-header__container {
+	@extend %o-grid-row;
+	@extend %o-grid-col;
+	@extend %o-grid-colspan-12;
+}
+
+.o-header__left,
+.o-header__right {
+	display: table-cell;
+	vertical-align: middle;
+}

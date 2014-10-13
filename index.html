@@ -17,14 +17,17 @@
 				</div>
 				<nav class="o-header__right o-header__nav"><!--
 					--><ul><!--
-						--><li><a href="/myft"><i class="icon icon__myft"></i>My FT</a></li><!--
-						--><li><a href="/search"><i class="icon icon__search"></i>Search</a></li><!--
-						--><li><a href="/sitemap"><i class="icon icon__menu"></i>Menu</a></li><!--
+						--><li><a href="/myft" class="o-header-button-js" data-target-panel="myft"><i class="icon icon__myft"></i>My FT</a></li><!--
+						--><li><a href="/search" class="o-header-button-js" data-target-panel="search"><i class="icon icon__search"></i>Search</a></li><!--
+						--><li><a href="/sitemap" class="o-header-button-js" data-target-panel="menu"><i class="icon icon__menu"></i>Menu</a></li><!--
 					--></ul><!--
 				--></nav>
 			</div>
 		</div>
 		<div class="o-header__container--secondary">
+			<div class="o-header__secondary o-header__secondary--myft">
+				My fav's, etc
+			</div>
 			<div class="o-header__secondary o-header__secondary--search">
 				<form action="/search" class="o-ft-forms__affix-wrapper">
 					<input type="search" name="q" class="o-ft-forms__field" placeholder="Search here" />
@@ -33,7 +36,11 @@
 					</div>
 				</form>
 			</div>
+			<div class="o-header__secondary o-header__secondary--menu">
+				Home, UK, World&hellip;
+			</div>
 		</div>
 	</header>
+	<script src="/build/main.js"></script>
 </body>
 </html>

@@ -4,7 +4,10 @@ var delegate = new Delegate(header);
 
 delegate.on('click', '.o-header-button-js', function(event) {
 	event.preventDefault();
-	var targetPanel = event.target.getAttribute('data-target-panel');
+
+	// HACK
+	var targetPanel = event.target.getAttribute('data-target-panel')
+		|| event.target.parentNode.getAttribute('data-target-panel');
 	var currentPanel = header.getAttribute('data-panel');
 	if (currentPanel !== targetPanel) {
 		header.setAttribute('data-panel', targetPanel);

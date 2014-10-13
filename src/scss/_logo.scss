@@ -1,10 +1,11 @@
-$o-header-logo-size: 40px;
-$o-header-logo-margin: 4px;
+$o-header-logo-size: 50px;
 
 .o-header__logo {
 	margin-right: 20px;
 	display: inline-block;
 	vertical-align: middle;
+	position: absolute;
+	top: 0;
 
 	> img {
 		display: inline-block;
@@ -15,9 +16,8 @@ $o-header-logo-margin: 4px;
 .o-header__logo--ft {
 	a {
 		display: block;
-		padding-top: $o-header-logo-margin;
-		width: $o-header-logo-size+$o-header-logo-margin*2;
-		height: $o-header-logo-size+$o-header-logo-margin*2;
+		width: $o-header-logo-size;
+		height: $o-header-logo-size;
 	}
 
 	abbr {

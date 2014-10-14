@@ -648,6 +648,10 @@ delegate.on('click', '.o-header-button-js', function(event) {
 	}
 });
 
+delegate.on('click', function(event) {
+	event.stopPropagation();
+});
+
 bodyDelegate.on('click', function(event) {
 	event.preventDefault();
 	event.stopPropagation();

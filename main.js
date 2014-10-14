@@ -1,9 +1,9 @@
+'use strict';
+
+require('fetch');
 var Delegate = require('dom-delegate');
 var header = document.querySelector('.o-header');
 var delegate = new Delegate(header);
-var fetch = require('fetch');
-console.log(fetch);
-debugger;
 
 delegate.on('click', '.o-header-button-js', function(event) {
 	event.preventDefault();
@@ -18,3 +18,20 @@ delegate.on('click', '.o-header-button-js', function(event) {
 		header.removeAttribute('data-panel');
 	}
 });
+
+window.fetch('http://next-companies-et-al.herokuapp.com/v1/ubernav.json')
+	.then(function(res) { return res.json(); })
+	.then(function(navData){
+		header.querySelector('.o-header__secondary--menu-js').innerHTML = '<ul class="uber-index">'
+			+ navData.data.map(function(item) {
+			return '<li class="uber-index__title" data-o-grid-colspan="12 M12 L3 XL3">'
+				+ '<a href="' + item.nextUrl + '">' + item.title + '</a>'
+				+ '<ul class="uber-index__children">'
+				+ item.navigationItems.map(function(child) {
+					return '<li class="uber-index__child"><a href="' + child.nextUrl + '">' + child.title + '</a></li>';
+				}).join('')
+				+ '</ul>'
+				+ '</li>';
+			}).join('');
+			+ '</ul>';
+	});

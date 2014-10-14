@@ -1,1 +1,664 @@
-!function t(e,r,n){function o(s,a){if(!r[s]){if(!e[s]){var h="function"==typeof require&&require;if(!a&&h)return h(s,!0);if(i)return i(s,!0);throw new Error("Cannot find module '"+s+"'")}var u=r[s]={exports:{}};e[s][0].call(u.exports,function(t){var r=e[s][1][t];return o(r?r:t)},u,u.exports,t,e,r,n)}return r[s].exports}for(var i="function"==typeof require&&require,s=0;s<n.length;s++)o(n[s]);return o}({1:[function(t,e){"use strict";function r(t){this.listenerMap=[{},{}],t&&this.root(t),this.handle=r.prototype.handle.bind(this)}function n(t,e){return t.toLowerCase()===e.tagName.toLowerCase()}function o(t,e){return this.rootElement===window?e===document:this.rootElement===e}function i(t,e){return t===e.id}e.exports=r,r.prototype.root=function(t){var e,r=this.listenerMap;if(this.rootElement){for(e in r[1])r[1].hasOwnProperty(e)&&this.rootElement.removeEventListener(e,this.handle,!0);for(e in r[0])r[0].hasOwnProperty(e)&&this.rootElement.removeEventListener(e,this.handle,!1)}if(!t||!t.addEventListener)return this.rootElement&&delete this.rootElement,this;this.rootElement=t;for(e in r[1])r[1].hasOwnProperty(e)&&this.rootElement.addEventListener(e,this.handle,!0);for(e in r[0])r[0].hasOwnProperty(e)&&this.rootElement.addEventListener(e,this.handle,!1);return this},r.prototype.captureForType=function(t){return-1!==["blur","error","focus","load","resize","scroll"].indexOf(t)},r.prototype.on=function(t,e,r,a){var h,u,c,l;if(!t)throw new TypeError("Invalid event type: "+t);if("function"==typeof e&&(a=r,r=e,e=null),void 0===a&&(a=this.captureForType(t)),"function"!=typeof r)throw new TypeError("Handler must be a type of Function");return h=this.rootElement,u=this.listenerMap[a?1:0],u[t]||(h&&h.addEventListener(t,this.handle,a),u[t]=[]),e?/^[a-z]+$/i.test(e)?(l=e,c=n):/^#[a-z0-9\-_]+$/i.test(e)?(l=e.slice(1),c=i):(l=e,c=s):(l=null,c=o.bind(this)),u[t].push({selector:e,handler:r,matcher:c,matcherParam:l}),this},r.prototype.off=function(t,e,r,n){var o,i,s,a,h;if("function"==typeof e&&(n=r,r=e,e=null),void 0===n)return this.off(t,e,r,!0),this.off(t,e,r,!1),this;if(s=this.listenerMap[n?1:0],!t){for(h in s)s.hasOwnProperty(h)&&this.off(h,e,r);return this}if(a=s[t],!a||!a.length)return this;for(o=a.length-1;o>=0;o--)i=a[o],e&&e!==i.selector||r&&r!==i.handler||a.splice(o,1);return a.length||(delete s[t],this.rootElement&&this.rootElement.removeEventListener(t,this.handle,n)),this},r.prototype.handle=function(t){var e,r,n,o,i,s,a,h=t.type,u=[],c="ftLabsDelegateIgnore";if(t[c]!==!0){switch(a=t.target,3===a.nodeType&&(a=a.parentNode),n=this.rootElement,o=t.eventPhase||(t.target!==t.currentTarget?3:2)){case 1:u=this.listenerMap[1][h];break;case 2:this.listenerMap[0]&&this.listenerMap[0][h]&&(u=u.concat(this.listenerMap[0][h])),this.listenerMap[1]&&this.listenerMap[1][h]&&(u=u.concat(this.listenerMap[1][h]));break;case 3:u=this.listenerMap[0][h]}for(r=u.length;a&&r;){for(e=0;r>e&&(i=u[e],i);e++)if(i.matcher.call(a,i.matcherParam,a)&&(s=this.fire(t,a,i)),s===!1)return t[c]=!0,void t.preventDefault();if(a===n)break;r=u.length,a=a.parentElement}}},r.prototype.fire=function(t,e,r){return r.handler.call(e,t,e)};var s=function(t){if(t){var e=t.prototype;return e.matches||e.matchesSelector||e.webkitMatchesSelector||e.mozMatchesSelector||e.msMatchesSelector||e.oMatchesSelector}}(Element);r.prototype.destroy=function(){this.off(),this.root()}},{}],2:[function(){!function(){"use strict";function t(e){this.map={};var r=this;e instanceof t?e.forEach(function(t,e){e.forEach(function(e){r.append(t,e)})}):e&&Object.getOwnPropertyNames(e).forEach(function(t){r.append(t,e[t])})}function e(){return this.body=null,this.bodyUsed=!1,this.arrayBuffer=function(){throw"Not implemented yet"},this.blob=function(){return Promise.resolve(new Blob([this.body]))},this.formData=function(){throw"Not implemented yet"},this.json=function(){var t=this.body;return new Promise(function(e,r){try{e(JSON.parse(t))}catch(n){r(n)}})},this.text=function(){return Promise.resolve(this.body)},this}function r(e,r){r=r||{},this.url=e,this.body=r.body,this.credentials=r.credentials||null,this.headers=new t(r.headers),this.method=r.method||"GET",this.mode=r.mode||null,this.referrer=null}function n(t){return Object.getOwnPropertyNames(t).filter(function(e){return void 0!==t[e]}).map(function(e){var r=null===t[e]?"":t[e];return encodeURIComponent(e)+"="+encodeURIComponent(r)}).join("&").replace(/%20/g,"+")}function o(t){try{return Object.getPrototypeOf(t)===Object.prototype}catch(e){return!1}}function i(e){var r=new t,n=e.getAllResponseHeaders().trim().split("\n");return n.forEach(function(t){var e=t.trim().split(":"),n=e.shift().trim(),o=e.join(":").trim();r.append(n,o)}),r}function s(t,e){this.body=t,this.type="default",this.url=null,this.status=e.status,this.statusText=e.statusText,this.headers=e.headers}window.fetch||(t.prototype.append=function(t,e){var r=this.map[t];r||(r=[],this.map[t]=r),r.push(e)},t.prototype.delete=function(t){delete this.map[t]},t.prototype.get=function(t){var e=this.map[t];return e?e[0]:null},t.prototype.getAll=function(t){return this.map[t]||[]},t.prototype.has=function(t){return this.map.hasOwnProperty(t)},t.prototype.set=function(t,e){this.map[t]=[e]},t.prototype.forEach=function(t){var e=this;Object.getOwnPropertyNames(this.map).forEach(function(r){t(r,e.map[r])})},r.prototype.fetch=function(){var t=this;return new Promise(function(e,r){var a=new XMLHttpRequest;a.onload=function(){var t={status:a.status,statusText:a.statusText,headers:i(a)};e(new s(a.responseText,t))},a.onerror=function(){r()},a.open(t.method,t.url),t.headers.forEach(function(t,e){e.forEach(function(e){a.setRequestHeader(t,e)})});var h=t.body;o(t.body)&&(a.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8"),h=n(t.body)),a.send(h)})},e.call(r.prototype),e.call(s.prototype),window.fetch=function(t,e){return new r(t,e).fetch()})}()},{}],3:[function(t){var e=t("./bower_components/dom-delegate/lib/delegate.js"),r=document.querySelector(".o-header"),n=new e(r),o=t("./bower_components/fetch/fetch.js");console.log(o),n.on("click",".o-header-button-js",function(t){t.preventDefault();var e=t.target.getAttribute("data-target-panel")||t.target.parentNode.getAttribute("data-target-panel"),n=r.getAttribute("data-panel");n!==e?r.setAttribute("data-panel",e):r.removeAttribute("data-panel")})},{"./bower_components/dom-delegate/lib/delegate.js":1,"./bower_components/fetch/fetch.js":2}]},{},[3]);
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+/*jshint browser:true, node:true*/
+
+'use strict';
+
+module.exports = Delegate;
+
+/**
+ * DOM event delegator
+ *
+ * The delegator will listen
+ * for events that bubble up
+ * to the root node.
+ *
+ * @constructor
+ * @param {Node|string} [root] The root node or a selector string matching the root node
+ */
+function Delegate(root) {
+
+  /**
+   * Maintain a map of listener
+   * lists, keyed by event name.
+   *
+   * @type Object
+   */
+  this.listenerMap = [{}, {}];
+  if (root) {
+    this.root(root);
+  }
+
+  /** @type function() */
+  this.handle = Delegate.prototype.handle.bind(this);
+}
+
+/**
+ * Start listening for events
+ * on the provided DOM element
+ *
+ * @param  {Node|string} [root] The root node or a selector string matching the root node
+ * @returns {Delegate} This method is chainable
+ */
+Delegate.prototype.root = function(root) {
+  var listenerMap = this.listenerMap;
+  var eventType;
+
+  // Remove master event listeners
+  if (this.rootElement) {
+    for (eventType in listenerMap[1]) {
+      if (listenerMap[1].hasOwnProperty(eventType)) {
+        this.rootElement.removeEventListener(eventType, this.handle, true);
+      }
+    }
+    for (eventType in listenerMap[0]) {
+      if (listenerMap[0].hasOwnProperty(eventType)) {
+        this.rootElement.removeEventListener(eventType, this.handle, false);
+      }
+    }
+  }
+
+  // If no root or root is not
+  // a dom node, then remove internal
+  // root reference and exit here
+  if (!root || !root.addEventListener) {
+    if (this.rootElement) {
+      delete this.rootElement;
+    }
+    return this;
+  }
+
+  /**
+   * The root node at which
+   * listeners are attached.
+   *
+   * @type Node
+   */
+  this.rootElement = root;
+
+  // Set up master event listeners
+  for (eventType in listenerMap[1]) {
+    if (listenerMap[1].hasOwnProperty(eventType)) {
+      this.rootElement.addEventListener(eventType, this.handle, true);
+    }
+  }
+  for (eventType in listenerMap[0]) {
+    if (listenerMap[0].hasOwnProperty(eventType)) {
+      this.rootElement.addEventListener(eventType, this.handle, false);
+    }
+  }
+
+  return this;
+};
+
+/**
+ * @param {string} eventType
+ * @returns boolean
+ */
+Delegate.prototype.captureForType = function(eventType) {
+  return ['blur', 'error', 'focus', 'load', 'resize', 'scroll'].indexOf(eventType) !== -1;
+};
+
+/**
+ * Attach a handler to one
+ * event for all elements
+ * that match the selector,
+ * now or in the future
+ *
+ * The handler function receives
+ * three arguments: the DOM event
+ * object, the node that matched
+ * the selector while the event
+ * was bubbling and a reference
+ * to itself. Within the handler,
+ * 'this' is equal to the second
+ * argument.
+ *
+ * The node that actually received
+ * the event can be accessed via
+ * 'event.target'.
+ *
+ * @param {string} eventType Listen for these events
+ * @param {string|undefined} selector Only handle events on elements matching this selector, if undefined match root element
+ * @param {function()} handler Handler function - event data passed here will be in event.data
+ * @param {Object} [eventData] Data to pass in event.data
+ * @returns {Delegate} This method is chainable
+ */
+Delegate.prototype.on = function(eventType, selector, handler, useCapture) {
+  var root, listenerMap, matcher, matcherParam;
+
+  if (!eventType) {
+    throw new TypeError('Invalid event type: ' + eventType);
+  }
+
+  // handler can be passed as
+  // the second or third argument
+  if (typeof selector === 'function') {
+    useCapture = handler;
+    handler = selector;
+    selector = null;
+  }
+
+  // Fallback to sensible defaults
+  // if useCapture not set
+  if (useCapture === undefined) {
+    useCapture = this.captureForType(eventType);
+  }
+
+  if (typeof handler !== 'function') {
+    throw new TypeError('Handler must be a type of Function');
+  }
+
+  root = this.rootElement;
+  listenerMap = this.listenerMap[useCapture ? 1 : 0];
+
+  // Add master handler for type if not created yet
+  if (!listenerMap[eventType]) {
+    if (root) {
+      root.addEventListener(eventType, this.handle, useCapture);
+    }
+    listenerMap[eventType] = [];
+  }
+
+  if (!selector) {
+    matcherParam = null;
+
+    // COMPLEX - matchesRoot needs to have access to
+    // this.rootElement, so bind the function to this.
+    matcher = matchesRoot.bind(this);
+
+  // Compile a matcher for the given selector
+  } else if (/^[a-z]+$/i.test(selector)) {
+    matcherParam = selector;
+    matcher = matchesTag;
+  } else if (/^#[a-z0-9\-_]+$/i.test(selector)) {
+    matcherParam = selector.slice(1);
+    matcher = matchesId;
+  } else {
+    matcherParam = selector;
+    matcher = matches;
+  }
+
+  // Add to the list of listeners
+  listenerMap[eventType].push({
+    selector: selector,
+    handler: handler,
+    matcher: matcher,
+    matcherParam: matcherParam
+  });
+
+  return this;
+};
+
+/**
+ * Remove an event handler
+ * for elements that match
+ * the selector, forever
+ *
+ * @param {string} [eventType] Remove handlers for events matching this type, considering the other parameters
+ * @param {string} [selector] If this parameter is omitted, only handlers which match the other two will be removed
+ * @param {function()} [handler] If this parameter is omitted, only handlers which match the previous two will be removed
+ * @returns {Delegate} This method is chainable
+ */
+Delegate.prototype.off = function(eventType, selector, handler, useCapture) {
+  var i, listener, listenerMap, listenerList, singleEventType;
+
+  // Handler can be passed as
+  // the second or third argument
+  if (typeof selector === 'function') {
+    useCapture = handler;
+    handler = selector;
+    selector = null;
+  }
+
+  // If useCapture not set, remove
+  // all event listeners
+  if (useCapture === undefined) {
+    this.off(eventType, selector, handler, true);
+    this.off(eventType, selector, handler, false);
+    return this;
+  }
+
+  listenerMap = this.listenerMap[useCapture ? 1 : 0];
+  if (!eventType) {
+    for (singleEventType in listenerMap) {
+      if (listenerMap.hasOwnProperty(singleEventType)) {
+        this.off(singleEventType, selector, handler);
+      }
+    }
+
+    return this;
+  }
+
+  listenerList = listenerMap[eventType];
+  if (!listenerList || !listenerList.length) {
+    return this;
+  }
+
+  // Remove only parameter matches
+  // if specified
+  for (i = listenerList.length - 1; i >= 0; i--) {
+    listener = listenerList[i];
+
+    if ((!selector || selector === listener.selector) && (!handler || handler === listener.handler)) {
+      listenerList.splice(i, 1);
+    }
+  }
+
+  // All listeners removed
+  if (!listenerList.length) {
+    delete listenerMap[eventType];
+
+    // Remove the main handler
+    if (this.rootElement) {
+      this.rootElement.removeEventListener(eventType, this.handle, useCapture);
+    }
+  }
+
+  return this;
+};
+
+
+/**
+ * Handle an arbitrary event.
+ *
+ * @param {Event} event
+ */
+Delegate.prototype.handle = function(event) {
+  var i, l, type = event.type, root, phase, listener, returned, listenerList = [], target, /** @const */ EVENTIGNORE = 'ftLabsDelegateIgnore';
+
+  if (event[EVENTIGNORE] === true) {
+    return;
+  }
+
+  target = event.target;
+
+  // Hardcode value of Node.TEXT_NODE
+  // as not defined in IE8
+  if (target.nodeType === 3) {
+    target = target.parentNode;
+  }
+
+  root = this.rootElement;
+
+  phase = event.eventPhase || ( event.target !== event.currentTarget ? 3 : 2 );
+  
+  switch (phase) {
+    case 1: //Event.CAPTURING_PHASE:
+      listenerList = this.listenerMap[1][type];
+    break;
+    case 2: //Event.AT_TARGET:
+      if (this.listenerMap[0] && this.listenerMap[0][type]) listenerList = listenerList.concat(this.listenerMap[0][type]);
+      if (this.listenerMap[1] && this.listenerMap[1][type]) listenerList = listenerList.concat(this.listenerMap[1][type]);
+    break;
+    case 3: //Event.BUBBLING_PHASE:
+      listenerList = this.listenerMap[0][type];
+    break;
+  }
+
+  // Need to continuously check
+  // that the specific list is
+  // still populated in case one
+  // of the callbacks actually
+  // causes the list to be destroyed.
+  l = listenerList.length;
+  while (target && l) {
+    for (i = 0; i < l; i++) {
+      listener = listenerList[i];
+
+      // Bail from this loop if
+      // the length changed and
+      // no more listeners are
+      // defined between i and l.
+      if (!listener) {
+        break;
+      }
+
+      // Check for match and fire
+      // the event if there's one
+      //
+      // TODO:MCG:20120117: Need a way
+      // to check if event#stopImmediatePropagation
+      // was called. If so, break both loops.
+      if (listener.matcher.call(target, listener.matcherParam, target)) {
+        returned = this.fire(event, target, listener);
+      }
+
+      // Stop propagation to subsequent
+      // callbacks if the callback returned
+      // false
+      if (returned === false) {
+        event[EVENTIGNORE] = true;
+        event.preventDefault();
+        return;
+      }
+    }
+
+    // TODO:MCG:20120117: Need a way to
+    // check if event#stopPropagation
+    // was called. If so, break looping
+    // through the DOM. Stop if the
+    // delegation root has been reached
+    if (target === root) {
+      break;
+    }
+
+    l = listenerList.length;
+    target = target.parentElement;
+  }
+};
+
+/**
+ * Fire a listener on a target.
+ *
+ * @param {Event} event
+ * @param {Node} target
+ * @param {Object} listener
+ * @returns {boolean}
+ */
+Delegate.prototype.fire = function(event, target, listener) {
+  return listener.handler.call(target, event, target);
+};
+
+/**
+ * Check whether an element
+ * matches a generic selector.
+ *
+ * @type function()
+ * @param {string} selector A CSS selector
+ */
+var matches = (function(el) {
+  if (!el) return;
+  var p = el.prototype;
+  return (p.matches || p.matchesSelector || p.webkitMatchesSelector || p.mozMatchesSelector || p.msMatchesSelector || p.oMatchesSelector);
+}(Element));
+
+/**
+ * Check whether an element
+ * matches a tag selector.
+ *
+ * Tags are NOT case-sensitive,
+ * except in XML (and XML-based
+ * languages such as XHTML).
+ *
+ * @param {string} tagName The tag name to test against
+ * @param {Element} element The element to test with
+ * @returns boolean
+ */
+function matchesTag(tagName, element) {
+  return tagName.toLowerCase() === element.tagName.toLowerCase();
+}
+
+/**
+ * Check whether an element
+ * matches the root.
+ *
+ * @param {?String} selector In this case this is always passed through as null and not used
+ * @param {Element} element The element to test with
+ * @returns boolean
+ */
+function matchesRoot(selector, element) {
+  /*jshint validthis:true*/
+  if (this.rootElement === window) return element === document;
+  return this.rootElement === element;
+}
+
+/**
+ * Check whether the ID of
+ * the element in 'this'
+ * matches the given ID.
+ *
+ * IDs are case-sensitive.
+ *
+ * @param {string} id The ID to test against
+ * @param {Element} element The element to test with
+ * @returns boolean
+ */
+function matchesId(id, element) {
+  return id === element.id;
+}
+
+/**
+ * Short hand for off()
+ * and root(), ie both
+ * with no parameters
+ *
+ * @return void
+ */
+Delegate.prototype.destroy = function() {
+  this.off();
+  this.root();
+};
+
+},{}],2:[function(require,module,exports){
+(function() {
+  'use strict';
+
+  if (window.fetch) {
+    return
+  }
+
+  function Headers(headers) {
+    this.map = {}
+
+    var self = this
+    if (headers instanceof Headers) {
+      headers.forEach(function(name, values) {
+        values.forEach(function(value) {
+          self.append(name, value)
+        })
+      })
+
+    } else if (headers) {
+      Object.getOwnPropertyNames(headers).forEach(function(name) {
+        self.append(name, headers[name])
+      })
+    }
+  }
+
+  Headers.prototype.append = function(name, value) {
+    var list = this.map[name]
+    if (!list) {
+      list = []
+      this.map[name] = list
+    }
+    list.push(value)
+  }
+
+  Headers.prototype.delete = function(name) {
+    delete this.map[name]
+  }
+
+  Headers.prototype.get = function(name) {
+    var values = this.map[name]
+    return values ? values[0] : null
+  }
+
+  Headers.prototype.getAll = function(name) {
+    return this.map[name] || []
+  }
+
+  Headers.prototype.has = function(name) {
+    return this.map.hasOwnProperty(name)
+  }
+
+  Headers.prototype.set = function(name, value) {
+    this.map[name] = [value]
+  }
+
+  // Instead of iterable for now.
+  Headers.prototype.forEach = function(callback) {
+    var self = this
+    Object.getOwnPropertyNames(this.map).forEach(function(name) {
+      callback(name, self.map[name])
+    })
+  }
+
+  function Body() {
+    this.body = null
+    this.bodyUsed = false
+
+    this.arrayBuffer = function() {
+      throw 'Not implemented yet'
+    }
+
+    this.blob = function() {
+      return Promise.resolve(new Blob([this.body]))
+    }
+
+    this.formData = function() {
+      throw 'Not implemented yet'
+    }
+
+    this.json = function() {
+      var body = this.body
+      return new Promise(function(resolve, reject) {
+        try {
+          resolve(JSON.parse(body))
+        } catch (ex) {
+          reject(ex)
+        }
+      })
+    }
+
+    this.text = function() {
+      return Promise.resolve(this.body)
+    }
+
+    return this
+  }
+
+  function Request(url, options) {
+    options = options || {}
+    this.url = url
+    this.body = options.body
+    this.credentials = options.credentials || null
+    this.headers = new Headers(options.headers)
+    this.method = options.method || 'GET'
+    this.mode = options.mode || null
+    this.referrer = null
+  }
+
+  function encode(params) {
+    return Object.getOwnPropertyNames(params).filter(function(name) {
+      return params[name] !== undefined
+    }).map(function(name) {
+      var value = (params[name] === null) ? '' : params[name]
+      return encodeURIComponent(name) + '=' + encodeURIComponent(value)
+    }).join('&').replace(/%20/g, '+')
+  }
+
+  function isObject(value) {
+    try {
+      return Object.getPrototypeOf(value) === Object.prototype
+    } catch (ex) {
+      // Probably a string literal.
+      return false
+    }
+  }
+
+  function headers(xhr) {
+    var head = new Headers()
+    var pairs = xhr.getAllResponseHeaders().trim().split('\n')
+    pairs.forEach(function(header) {
+      var split = header.trim().split(':')
+      var key = split.shift().trim()
+      var value = split.join(':').trim()
+      head.append(key, value)
+    })
+    return head
+  }
+
+  Request.prototype.fetch = function() {
+    var self = this
+
+    return new Promise(function(resolve, reject) {
+      var xhr = new XMLHttpRequest()
+
+      xhr.onload = function() {
+        var options = {
+          status: xhr.status,
+          statusText: xhr.statusText,
+          headers: headers(xhr)
+        }
+        resolve(new Response(xhr.responseText, options))
+      }
+
+      xhr.onerror = function() {
+        reject()
+      }
+
+      xhr.open(self.method, self.url)
+
+      self.headers.forEach(function(name, values) {
+        values.forEach(function(value) {
+          xhr.setRequestHeader(name, value)
+        })
+      })
+
+      var body = self.body
+      if (isObject(self.body)) {
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8')
+        body = encode(self.body)
+      }
+      xhr.send(body)
+    })
+  }
+
+  Body.call(Request.prototype)
+
+  function Response(body, options) {
+    this.body = body
+    this.type = 'default'
+    this.url = null
+    this.status = options.status
+    this.statusText = options.statusText
+    this.headers = options.headers
+  }
+
+  Body.call(Response.prototype)
+
+  window.fetch = function (url, options) {
+    return new Request(url, options).fetch()
+  }
+})()
+
+},{}],3:[function(require,module,exports){
+'use strict';
+
+require("./bower_components/fetch/fetch.js");
+var Delegate = require("./bower_components/dom-delegate/lib/delegate.js");
+var header = document.querySelector('.o-header');
+var delegate = new Delegate(header);
+
+delegate.on('click', '.o-header-button-js', function(event) {
+	event.preventDefault();
+
+	// HACK
+	var targetPanel = event.target.getAttribute('data-target-panel')
+		|| event.target.parentNode.getAttribute('data-target-panel');
+	var currentPanel = header.getAttribute('data-panel');
+	if (currentPanel !== targetPanel) {
+		header.setAttribute('data-panel', targetPanel);
+	} else {
+		header.removeAttribute('data-panel');
+	}
+});
+
+window.fetch('http://next-companies-et-al.herokuapp.com/v1/ubernav.json')
+	.then(function(res) { return res.json(); })
+	.then(function(navData){
+		header.querySelector('.o-header__secondary--menu-js').innerHTML = '<ul class="uber-index">'
+			+ navData.data.map(function(item) {
+			return '<li class="uber-index__title" data-o-grid-colspan="12 M12 L3 XL3">'
+				+ '<a href="' + item.nextUrl + '">' + item.title + '</a>'
+				+ '<ul class="uber-index__children">'
+				+ item.navigationItems.map(function(child) {
+					return '<li class="uber-index__child"><a href="' + child.nextUrl + '">' + child.title + '</a></li>';
+				}).join('')
+				+ '</ul>'
+				+ '</li>';
+			}).join('');
+			+ '</ul>';
+	});
+
+},{"./bower_components/dom-delegate/lib/delegate.js":1,"./bower_components/fetch/fetch.js":2}]},{},[3])

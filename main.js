@@ -3,6 +3,7 @@ var header = document.querySelector('.o-header');
 var delegate = new Delegate(header);
 var fetch = require('fetch');
 console.log(fetch);
+debugger;
 
 delegate.on('click', '.o-header-button-js', function(event) {
 	event.preventDefault();

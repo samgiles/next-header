@@ -4,19 +4,29 @@ require('fetch');
 var Delegate = require('dom-delegate');
 var header = document.querySelector('.o-header');
 var delegate = new Delegate(header);
+var bodyDelegate = new Delegate();
 
 delegate.on('click', '.o-header-button-js', function(event) {
 	event.preventDefault();
+	event.stopPropagation();
 
 	// HACK
 	var targetPanel = event.target.getAttribute('data-target-panel')
 		|| event.target.parentNode.getAttribute('data-target-panel');
 	var currentPanel = header.getAttribute('data-panel');
 	if (currentPanel !== targetPanel) {
+		bodyDelegate.root(document.body);
 		header.setAttribute('data-panel', targetPanel);
 	} else {
+		bodyDelegate.root();
 		header.removeAttribute('data-panel');
 	}
+});
+
+bodyDelegate.on('click', function(event) {
+	event.preventDefault();
+	event.stopPropagation();
+	header.removeAttribute('data-panel');
 });
 
 window.fetch('http://next-companies-et-al.herokuapp.com/v1/ubernav.json')

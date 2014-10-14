@@ -12,6 +12,10 @@
 	.o-header[data-panel=search] & {
 		display: block;	
 	}
+
+	form {
+		margin: 0;
+	}
 }
 
 .o-header__secondary--myft {

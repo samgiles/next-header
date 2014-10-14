@@ -38,7 +38,7 @@ window.fetch('http://next-companies-et-al.herokuapp.com/v1/ubernav.json')
 	.then(function(navData){
 		header.querySelector('.o-header__secondary--menu-js').innerHTML = '<ul class="uber-index">'
 			+ navData.data.map(function(item) {
-			return '<li class="uber-index__title" data-o-grid-colspan="12 M12 L3 XL3">'
+			return '<li class="uber-index__title" data-o-grid-colspan="6 M6 L3 XL3">'
 				+ '<a href="' + item.nextUrl + '">' + item.title + '</a>'
 				+ '<ul class="uber-index__children">'
 				+ item.navigationItems.map(function(child) {

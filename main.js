@@ -3,6 +3,7 @@
 require('fetch');
 var Delegate = require('dom-delegate');
 var header = document.querySelector('.o-header');
+var defaultPanel = header.getAttribute('data-default-panel');
 var delegate = new Delegate(header);
 var bodyDelegate = new Delegate();
 
@@ -12,14 +13,19 @@ delegate.on('click', '.o-header-button-js', function(event) {
 
 	// HACK
 	var targetPanel = event.target.getAttribute('data-target-panel')
-		|| event.target.parentNode.getAttribute('data-target-panel');
+		|| event.target.parentNode.getAttribute('data-target-panel')
+		|| defaultPanel;
 	var currentPanel = header.getAttribute('data-panel');
-	if (currentPanel !== targetPanel) {
+	if (currentPanel !== targetPanel && targetPanel !== defaultPanel) {
 		bodyDelegate.root(document.body);
 		header.setAttribute('data-panel', targetPanel);
 	} else {
 		bodyDelegate.root();
-		header.removeAttribute('data-panel');
+		if (defaultPanel) {
+			header.setAttribute('data-panel', defaultPanel);
+		} else {
+			header.removeAttribute('data-panel');
+		}
 	}
 });
 

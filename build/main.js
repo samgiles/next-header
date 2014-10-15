@@ -661,7 +661,11 @@ delegate.on('click', function(event) {
 bodyDelegate.on('click', function(event) {
 	event.preventDefault();
 	event.stopPropagation();
-	header.removeAttribute('data-panel');
+	if (defaultPanel) {
+		header.setAttribute('data-panel', defaultPanel);
+	} else {
+		header.removeAttribute('data-panel');
+	}
 });
 
 window.fetch('http://next-companies-et-al.herokuapp.com/v1/ubernav.json')

@@ -17,7 +17,7 @@
 				</div>
 				<nav class="o-header__right o-header__nav"><!--
 					--><ul><!--
-						--><li><a href="#" class="o-header-button-js"><i class="icon icon__myft"></i>My FT</a></li><!--
+						--><li><a href="/my-ft" class="o-header-button-js" data-target-panel="myft"><i class="icon icon__myft"></i>My FT</a></li><!--
 						--><li><a href="/search" class="o-header-button-js" data-target-panel="search"><i class="icon icon__search"></i>Search</a></li><!--
 						--><li><a href="/sitemap" class="o-header-button-js" data-target-panel="menu"><i class="icon icon__menu"></i>Menu</a></li><!--
 					--></ul><!--
@@ -25,6 +25,17 @@
 			</div>
 		</div>
 		<div class="o-header__container--secondary">
+			<div class="o-header__secondary o-header__secondary--myft o-header__secondary--myft-js">
+				<ul class="myft">
+					<li data-o-grid-colspan="6 M6 L6 XL6" >
+						<div class="myft__title">Favourites</div>
+						<ul data-user-preference-list="favourites"></ul>
+					</li>
+					<li data-o-grid-colspan="6 M6 L6 XL6">
+						<div class="myft__title">Read For Later</div>
+						<ul data-user-preference-list="forlaters"></ul>
+					</li>
+			</div>
 			<div class="o-header__secondary o-header__secondary--search">
 				<form action="/search" class="o-ft-forms__affix-wrapper">
 					<input type="search" name="q" class="o-ft-forms__field" placeholder="Search here" />

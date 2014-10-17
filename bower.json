@@ -7,7 +7,8 @@
     "o-assets": "~0.4.5",
     "o-ft-forms": "~0.10.0",
     "dom-delegate": "~2.0.3",
-    "superagent": "~0.18.0"
+    "superagent": "~0.18.0",
+    "next-user-preferences": "https://github.com/Financial-Times/next-user-preferences.git#js-component"
   },
   "main": [
     "main.scss",

@@ -3,9 +3,11 @@
 var reqwest = require('reqwest');
 var Delegate = require('dom-delegate');
 var header = document.querySelector('.o-header');
+var myFt = document.querySelector('.o-header__secondary--myft-js')
 var defaultPanel = header.getAttribute('data-default-panel');
 var delegate = new Delegate(header);
 var bodyDelegate = new Delegate();
+var nextUserPreferences = require('next-user-preferences');
 
 delegate.on('click', '.o-header-button-js', function(event) {
 	event.preventDefault();
@@ -58,3 +60,5 @@ reqwest('http://next-companies-et-al.herokuapp.com/v1/ubernav.json', function(re
 		}).join('');
 		+ '</ul>';
 });
+
+if (myFt) nextUserPreferences.init(myFt);

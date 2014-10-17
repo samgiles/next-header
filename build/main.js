@@ -1041,14 +1041,486 @@ Delegate.prototype.destroy = function() {
 };
 
 },{}],3:[function(require,module,exports){
+// Stores a unique list of things (Eg, sections, favourites, history) against a
+// key in localStorage
+
+var reqwest = require('../vendor/reqwest.min');
+
+var API_URL = 'http://ft-next-api-user-prefs.herokuapp.com/user/';
+
+var emit = function(name, data) {
+  var event = document.createEvent('Event');
+  event.initEvent(name, true, true);
+  if (data) {
+    event.detail = data;
+  }
+  top.document.dispatchEvent(event);
+};
+
+
+var Me = function (key, userId) {
+  if (!key) {
+    throw new Error('You must supply a key /^[a-z]+$/');
+  }
+  this.key = key;
+
+  this.localStorageKey = 'ft.next.user.' + key;
+
+  if(userId) {
+    this.apiURL = API_URL + key;
+    this.userId = userId;
+  }      
+    //Start off with local copy...
+    this.val = this.getOrCreate();
+    //Then try and fetch server copy
+    this.fetch();
+
+  };
+
+  Me.prototype.get = function (key) {
+    key = key || this.localStorageKey;
+    var exists = localStorage.getItem(key);
+    if (exists) {
+      return JSON.parse(exists);
+    } else {
+      return false;
+    }
+  };
+
+  Me.prototype.getOrCreate = function (key) {
+    key = key || this.localStorageKey;
+    var saved = this.get(key);
+    if(saved) {
+      return saved;
+    } else {
+      var empty = [];
+      localStorage.setItem(key, JSON.stringify(empty));
+      return empty;
+    }
+  };
+
+  Me.prototype.fetch = function() {
+
+    var me = this;
+
+    //If no userID don't fetch from server
+    if(!this.userId) {
+      return;
+    }
+
+    reqwest({
+      url: this.apiURL,
+      type: 'json',
+      method: 'get',
+      headers: {
+        'X-FT-UID': this.userId
+      },
+      crossOrigin: true
+    }).then(function(faves) {
+      if(faves) {
+        me.val = faves;
+        //accept the server copy as 'the truth'...
+        me.save(me.val);
+        //but then process any leftover requests locally
+        me.processPending('add');
+        me.processPending('remove');
+        me.processPending('clear');
+      }
+    }).always(function(err) {
+      //trigger load and update events
+      emit(me.key + ':load', me);
+      emit(me.key + ':update', me);
+    });  
+  };
+
+  Me.prototype.save = function (obj, key) {
+    key = key || this.localStorageKey;
+    if(obj && obj.length) {
+      localStorage.setItem(key, JSON.stringify(obj)); 
+    } else {
+      localStorage.removeItem(key);
+    }
+  };
+
+  Me.prototype.addPending = function(obj, action) {
+    var pending = this.getOrCreate(this.localStorageKey + '.' + action);
+    pending.push(obj);
+    //if we're adding something, then get rid of any pending clear requests
+    if(action === 'add') {
+      localStorage.removeItem(this.localStorageKey + '.clear');
+    }
+    this.save(pending, this.localStorageKey + '.' + action);
+  };
+
+  Me.prototype.processPending = function(action) {
+    var me = this;
+    var pending = this.get(this.localStorageKey + '.' + action);
+    if(pending && pending.length) {
+      //Clear is a special case
+      if(action === 'clear') {
+        if(pending[pending.length - 1] === true) {
+          me.clear();
+          pending = null;
+        }
+      } else {
+        pending.forEach(function(itemToAdd, index) {
+           // remove the item from the todo list and execute the action 
+           pending.splice(index, 1);
+           me[action](itemToAdd);
+         });
+      }
+      this.save(pending, this.localStorageKey + '.' + action);
+    }
+
+  };
+
+  Me.prototype.add = function (obj) {
+    var me = this;
+    this.val = this.getOrCreate();
+    if (!this.exists(obj.uuidv3)) {
+      this.val.push(obj);
+      this.save(this.val);
+      emit(me.key + ':update', me); //trigger event to render UI
+
+      //Send a request to add to server
+      if(this.apiURL) {
+        reqwest({
+          url: this.apiURL,
+          method: 'put',
+          type: 'json',
+          contentType: 'application/json',
+          data: JSON.stringify(obj),
+          headers: {
+            'X-FT-UID': this.userId
+          },
+          crossOrigin: true
+        }).fail(function() {
+          me.addPending(obj, 'add'); //server request failed so push it to the list of pending
+        });
+      }
+    }
+  };
+
+  Me.prototype.remove = function (obj) {
+    var me = this;
+
+    this.val = this.getOrCreate();
+    this.val = this.val.filter(function(item) {
+      return (item.uuidv3 !== obj.uuidv3);
+    });
+    this.save(this.val);
+
+    emit(me.key + ':update', me); //trigger event to render UI
+
+    //Send a request to delete from server
+    if(this.apiURL) {
+
+      reqwest({
+        url: this.apiURL + '/' + encodeURI(decodeURI(obj.uuidv3)),
+        type: 'json',
+        method: 'delete',
+        headers: {
+          'X-FT-UID': this.userId
+        },
+        crossOrigin: true
+      }).fail(function() {
+        me.addPending(obj, 'remove');  //server request failed so push it to the list of pending
+      });
+    }
+  };
+
+
+  Me.prototype.exists = function (uuid) {
+    this.val = this.getOrCreate();
+    return this.val.some(function (item) {
+      return item.uuidv3 === uuid;
+    });
+  };
+
+  Me.prototype.clear = function () {
+    var me = this;
+    var status = localStorage.removeItem(this.localStorageKey);
+    this.val = [];
+
+    emit(me.key + ':update', me); //trigger event to render UI
+
+      //Send a request to delete ALL from server
+      if(this.apiURL) {
+
+        reqwest({
+          url: this.apiURL,
+          type: 'json',
+          method: 'delete',
+          headers: {
+            'X-FT-UID': this.userId
+          },
+          crossOrigin: true
+        }).fail(function() {
+          me.addPending(true, 'clear');
+        });
+      }
+
+      return status;
+    };
+
+
+    module.exports = Me;
+
+
+},{"../vendor/reqwest.min":7}],4:[function(require,module,exports){
+var reqwest = require('../vendor/reqwest.min');
+
+
+var NOTIFICATIONS_URL = 'http://ft-next-api-user-prefs.herokuapp.com/user/notifications/';
+var emit = function(name, data) {
+	var event = document.createEvent('Event');
+	event.initEvent(name, true, true);
+	if (data) {
+		event.detail = data;
+	}
+	top.document.dispatchEvent(event);
+};
+
+var getCurrentStream = function() {
+  var onArticle = /^\/[a-f0-9]+-(.*)/.test(location.pathname); // '27a5e286-4314-11e4-8a43-00144feabdc0'; 
+  if(onArticle) {
+  	return false;
+  } else {
+  	return localStorage.getItem('ft.stream.context.url');
+  }
+};
+
+function NotificationPoller(userPreferenceList) {
+	this.userPreferenceList = userPreferenceList;
+	setInterval(this.poll.bind(this), 1000 * 60 * 0.5); //30 second polling
+	this.notifications = {};
+
+	//Clear notifications if a stream has been openend
+	this.currentStream = getCurrentStream();
+	if(this.currentStream) {
+		this.clear(this.currentStream);
+	}
+
+	this.poll();
+
+}
+
+
+NotificationPoller.prototype.poll = function() {
+	var poller = this;
+
+	this.userPreferenceList.list.get().forEach(function(stream) {
+		//don't bother fetching if you are on that stream currently
+		if(stream.resourceType !== 'stream' || stream.uuidv3 === poller.currentStream) {
+			return false;
+		}
+		reqwest({
+			url: NOTIFICATIONS_URL + stream.uuidv3,
+			type: 'json',
+			method: 'get',
+			headers: {
+				'X-FT-UID': poller.userPreferenceList.userId
+			},
+			crossOrigin: true
+		}).then(function(notifications) {
+			if(notifications && notifications.length) {
+				poller.notifications[stream.uuidv3] = notifications;
+			} else {
+				poller.notifications[stream.uuidv3] = [];
+			}
+			poller.render();
+		});
+		
+	});
+};
+
+function renderBadge(el, number) {
+	var badge = el.getElementsByClassName('js-notify-badge')[0];
+	if(!badge) {
+		badge = document.createElement('span');
+		badge.className = 'notify-badge js-notify-badge';
+		el.appendChild(badge);
+	}
+	if(number > 0) {
+		badge.removeAttribute('aria-hidden');
+		badge.textContent = number;
+	} else {
+		badge.setAttribute('aria-hidden', '');
+	}
+}
+
+NotificationPoller.prototype.render = function() {
+	for(var stream in this.notifications) {
+		link = this.userPreferenceList.container.querySelector('[href="/search?q=' + stream + '"]');
+		if(link) {
+			renderBadge(link, this.notifications[stream].length);
+		}
+	}
+};
+
+NotificationPoller.prototype.clear = function(uuid) {
+	if(uuid) {
+		this.notifications[uuid] = [];
+		reqwest({
+			url: NOTIFICATIONS_URL + uuid,
+			type: 'json',
+			method: 'delete',
+			headers: {
+				'X-FT-UID': this.userPreferenceList.userId
+			},
+			crossOrigin: true
+		});
+	} else if (typeof uuid === 'undefined') {
+		this.notifications = {};
+	}
+	this.render();
+};
+
+module.exports = NotificationPoller;
+},{"../vendor/reqwest.min":7}],5:[function(require,module,exports){
+var NotificationPoller = require('./NotificationPoller');
+var Me = require('./Me');
+
+var $ = function (selector) {
+  return [].slice.call(document.querySelectorAll(selector));
+};
+var emit = function(name, data) {
+  var event = document.createEvent('Event');
+  event.initEvent(name, true, true);
+  if (data) {
+    event.detail = data;
+  }
+  top.document.dispatchEvent(event);
+};
+
+var getUserId = function() {
+  var value = "; " + document.cookie;
+  var parts = value.split("; FT_U=");
+  var ftU = parts.pop().split(";").shift();
+  if(ftU) {
+    return ftU.match(/_EID=(\d+)_PID/)[1];
+  } else {
+    return;
+  }
+};
+
+var UserPreferenceList = function(container, opts) {
+  var self = this;
+  this.userId = getUserId();
+  this.key = container.getAttribute('data-user-preference-list');
+  this.container = container;
+  this.notify = opts.notify;
+
+
+
+};
+
+UserPreferenceList.prototype.init = function() {
+  if(!this.userId) {
+    this.render();
+  }
+
+  document.addEventListener(this.key + ':add', function(ev) {
+    self.add(ev.detail);
+  });
+  document.addEventListener(this.key + ':remove', function(ev) {
+    self.remove(ev.detail);
+  });
+
+  document.addEventListener(this.key + ':clear', this.clear.bind(this));
+  document.addEventListener(this.key + ':update', this.render.bind(this));
+
+  $('[data-list-source="' + this.key + '"] .clear__button').map(function (el) {
+    el.addEventListener('click', self.clear.bind(self));
+  });
+
+  this.list = new Me(this.key, this.userId);
+
+  if(this.notify === true) {
+    this.notifier = new NotificationPoller(this);
+  }
+}
+
+UserPreferenceList.prototype.render = function() {
+  var me = this;
+  var href = '';
+
+  var links = this.list ? this.list.getOrCreate().reverse() : [];
+
+  var linksHTML = links.map(function (section) {
+    href = section.resourceType === 'stream' ? '/search?q=' + section.uuidv3 : '/' + section.uuidv3;
+    return '<li class="item-type--' + section.resourceType + '"><a href="' + href + '">' + section.displayText + '</a></li>';
+  }).join('');
+  
+  if(this.container) {
+    this.container.innerHTML =  linksHTML;
+  }
+  if(this.notifier) {
+    this.notifier.render();
+  }
+};
+
+
+UserPreferenceList.prototype.add = function(obj) {
+  this.list.add(obj);
+};
+
+UserPreferenceList.prototype.remove = function(obj) {
+  this.list.remove(obj);
+};
+
+UserPreferenceList.prototype.clear = function() {
+  this.list.clear();
+};
+
+UserPreferenceList.init = function(rootEl, opts) {
+  var components = {}, 
+      fEls, 
+      c, l, 
+      component;
+
+  rootEl = rootEl || document.body;
+  //set config with overrides passed through
+
+  if (rootEl.querySelectorAll) {
+    fEls = rootEl.querySelectorAll('[data-user-preference-list]');
+    for (c = 0, l = fEls.length; c < l; c++) {
+      if (!fEls[c].hasAttribute('data-o-author-alerts--js')) {
+        component = new UserPreferenceList(fEls[c], opts || {});
+        component.init(opts);
+        components[fEls[c].getAttribute('data-user-preference-list')] = component;
+      }
+    }
+  }
+
+  return components;
+};
+
+
+module.exports = UserPreferenceList;
+
+},{"./Me":3,"./NotificationPoller":4}],6:[function(require,module,exports){
+var UserPreferenceList = require('./lib/UserPreferenceList');
+
+module.exports = UserPreferenceList;
+},{"./lib/UserPreferenceList":5}],7:[function(require,module,exports){
+/*!
+  * Reqwest! A general purpose XHR connection manager
+  * license MIT (c) Dustin Diaz 2014
+  * https://github.com/ded/reqwest
+  */
+!function(e,t,n){typeof module!="undefined"&&module.exports?module.exports=n():typeof define=="function"&&define.amd?define(n):t[e]=n()}("reqwest",this,function(){function succeed(e){return httpsRe.test(window.location.protocol)?twoHundo.test(e.status):!!e.response}function handleReadyState(e,t,n){return function(){if(e._aborted)return n(e.request);e.request&&e.request[readyState]==4&&(e.request.onreadystatechange=noop,succeed(e.request)?t(e.request):n(e.request))}}function setHeaders(e,t){var n=t.headers||{},r;n.Accept=n.Accept||defaultHeaders.accept[t.type]||defaultHeaders.accept["*"];var i=typeof FormData=="function"&&t.data instanceof FormData;!t.crossOrigin&&!n[requestedWith]&&(n[requestedWith]=defaultHeaders.requestedWith),!n[contentType]&&!i&&(n[contentType]=t.contentType||defaultHeaders.contentType);for(r in n)n.hasOwnProperty(r)&&"setRequestHeader"in e&&e.setRequestHeader(r,n[r])}function setCredentials(e,t){typeof t.withCredentials!="undefined"&&typeof e.withCredentials!="undefined"&&(e.withCredentials=!!t.withCredentials)}function generalCallback(e){lastValue=e}function urlappend(e,t){return e+(/\?/.test(e)?"&":"?")+t}function handleJsonp(e,t,n,r){var i=uniqid++,s=e.jsonpCallback||"callback",o=e.jsonpCallbackName||reqwest.getcallbackPrefix(i),u=new RegExp("((^|\\?|&)"+s+")=([^&]+)"),a=r.match(u),f=doc.createElement("script"),l=0,c=navigator.userAgent.indexOf("MSIE 10.0")!==-1;return a?a[3]==="?"?r=r.replace(u,"$1="+o):o=a[3]:r=urlappend(r,s+"="+o),win[o]=generalCallback,f.type="text/javascript",f.src=r,f.async=!0,typeof f.onreadystatechange!="undefined"&&!c&&(f.htmlFor=f.id="_reqwest_"+i),f.onload=f.onreadystatechange=function(){if(f[readyState]&&f[readyState]!=="complete"&&f[readyState]!=="loaded"||l)return!1;f.onload=f.onreadystatechange=null,f.onclick&&f.onclick(),t(lastValue),lastValue=undefined,head.removeChild(f),l=1},head.appendChild(f),{abort:function(){f.onload=f.onreadystatechange=null,n({},"Request is aborted: timeout",{}),lastValue=undefined,head.removeChild(f),l=1}}}function getRequest(e,t){var n=this.o,r=(n.method||"GET").toUpperCase(),i=typeof n=="string"?n:n.url,s=n.processData!==!1&&n.data&&typeof n.data!="string"?reqwest.toQueryString(n.data):n.data||null,o,u=!1;return(n["type"]=="jsonp"||r=="GET")&&s&&(i=urlappend(i,s),s=null),n["type"]=="jsonp"?handleJsonp(n,e,t,i):(o=n.xhr&&n.xhr(n)||xhr(n),o.open(r,i,n.async===!1?!1:!0),setHeaders(o,n),setCredentials(o,n),win[xDomainRequest]&&o instanceof win[xDomainRequest]?(o.onload=e,o.onerror=t,o.onprogress=function(){},u=!0):o.onreadystatechange=handleReadyState(this,e,t),n.before&&n.before(o),u?setTimeout(function(){o.send(s)},200):o.send(s),o)}function Reqwest(e,t){this.o=e,this.fn=t,init.apply(this,arguments)}function setType(e){if(e.match("json"))return"json";if(e.match("javascript"))return"js";if(e.match("text"))return"html";if(e.match("xml"))return"xml"}function init(o,fn){function complete(e){o.timeout&&clearTimeout(self.timeout),self.timeout=null;while(self._completeHandlers.length>0)self._completeHandlers.shift()(e)}function success(resp){var type=o.type||setType(resp.getResponseHeader("Content-Type"));resp=type!=="jsonp"?self.request:resp;var filteredResponse=globalSetupOptions.dataFilter(resp.responseText,type),r=filteredResponse;try{resp.responseText=r}catch(e){}if(r)switch(type){case"json":try{resp=win.JSON?win.JSON.parse(r):eval("("+r+")")}catch(err){return error(resp,"Could not parse JSON in response",err)}break;case"js":resp=eval(r);break;case"html":resp=r;break;case"xml":resp=resp.responseXML&&resp.responseXML.parseError&&resp.responseXML.parseError.errorCode&&resp.responseXML.parseError.reason?null:resp.responseXML}self._responseArgs.resp=resp,self._fulfilled=!0,fn(resp),self._successHandler(resp);while(self._fulfillmentHandlers.length>0)resp=self._fulfillmentHandlers.shift()(resp);complete(resp)}function error(e,t,n){e=self.request,self._responseArgs.resp=e,self._responseArgs.msg=t,self._responseArgs.t=n,self._erred=!0;while(self._errorHandlers.length>0)self._errorHandlers.shift()(e,t,n);complete(e)}this.url=typeof o=="string"?o:o.url,this.timeout=null,this._fulfilled=!1,this._successHandler=function(){},this._fulfillmentHandlers=[],this._errorHandlers=[],this._completeHandlers=[],this._erred=!1,this._responseArgs={};var self=this;fn=fn||function(){},o.timeout&&(this.timeout=setTimeout(function(){self.abort()},o.timeout)),o.success&&(this._successHandler=function(){o.success.apply(o,arguments)}),o.error&&this._errorHandlers.push(function(){o.error.apply(o,arguments)}),o.complete&&this._completeHandlers.push(function(){o.complete.apply(o,arguments)}),this.request=getRequest.call(this,success,error)}function reqwest(e,t){return new Reqwest(e,t)}function normalize(e){return e?e.replace(/\r?\n/g,"\r\n"):""}function serial(e,t){var n=e.name,r=e.tagName.toLowerCase(),i=function(e){e&&!e.disabled&&t(n,normalize(e.attributes.value&&e.attributes.value.specified?e.value:e.text))},s,o,u,a;if(e.disabled||!n)return;switch(r){case"input":/reset|button|image|file/i.test(e.type)||(s=/checkbox/i.test(e.type),o=/radio/i.test(e.type),u=e.value,(!s&&!o||e.checked)&&t(n,normalize(s&&u===""?"on":u)));break;case"textarea":t(n,normalize(e.value));break;case"select":if(e.type.toLowerCase()==="select-one")i(e.selectedIndex>=0?e.options[e.selectedIndex]:null);else for(a=0;e.length&&a<e.length;a++)e.options[a].selected&&i(e.options[a])}}function eachFormElement(){var e=this,t,n,r=function(t,n){var r,i,s;for(r=0;r<n.length;r++){s=t[byTag](n[r]);for(i=0;i<s.length;i++)serial(s[i],e)}};for(n=0;n<arguments.length;n++)t=arguments[n],/input|select|textarea/i.test(t.tagName)&&serial(t,e),r(t,["input","select","textarea"])}function serializeQueryString(){return reqwest.toQueryString(reqwest.serializeArray.apply(null,arguments))}function serializeHash(){var e={};return eachFormElement.apply(function(t,n){t in e?(e[t]&&!isArray(e[t])&&(e[t]=[e[t]]),e[t].push(n)):e[t]=n},arguments),e}function buildParams(e,t,n,r){var i,s,o,u=/\[\]$/;if(isArray(t))for(s=0;t&&s<t.length;s++)o=t[s],n||u.test(e)?r(e,o):buildParams(e+"["+(typeof o=="object"?s:"")+"]",o,n,r);else if(t&&t.toString()==="[object Object]")for(i in t)buildParams(e+"["+i+"]",t[i],n,r);else r(e,t)}var win=window,doc=document,httpsRe=/^http/,twoHundo=/^(20\d|1223)$/,byTag="getElementsByTagName",readyState="readyState",contentType="Content-Type",requestedWith="X-Requested-With",head=doc[byTag]("head")[0],uniqid=0,callbackPrefix="reqwest_"+ +(new Date),lastValue,xmlHttpRequest="XMLHttpRequest",xDomainRequest="XDomainRequest",noop=function(){},isArray=typeof Array.isArray=="function"?Array.isArray:function(e){return e instanceof Array},defaultHeaders={contentType:"application/x-www-form-urlencoded",requestedWith:xmlHttpRequest,accept:{"*":"text/javascript, text/html, application/xml, text/xml, */*",xml:"application/xml, text/xml",html:"text/html",text:"text/plain",json:"application/json, text/javascript",js:"application/javascript, text/javascript"}},xhr=function(e){if(e.crossOrigin===!0){var t=win[xmlHttpRequest]?new XMLHttpRequest:null;if(t&&"withCredentials"in t)return t;if(win[xDomainRequest])return new XDomainRequest;throw new Error("Browser does not support cross-origin requests")}return win[xmlHttpRequest]?new XMLHttpRequest:new ActiveXObject("Microsoft.XMLHTTP")},globalSetupOptions={dataFilter:function(e){return e}};return Reqwest.prototype={abort:function(){this._aborted=!0,this.request.abort()},retry:function(){init.call(this,this.o,this.fn)},then:function(e,t){return e=e||function(){},t=t||function(){},this._fulfilled?this._responseArgs.resp=e(this._responseArgs.resp):this._erred?t(this._responseArgs.resp,this._responseArgs.msg,this._responseArgs.t):(this._fulfillmentHandlers.push(e),this._errorHandlers.push(t)),this},always:function(e){return this._fulfilled||this._erred?e(this._responseArgs.resp):this._completeHandlers.push(e),this},fail:function(e){return this._erred?e(this._responseArgs.resp,this._responseArgs.msg,this._responseArgs.t):this._errorHandlers.push(e),this},"catch":function(e){return this.fail(e)}},reqwest.serializeArray=function(){var e=[];return eachFormElement.apply(function(t,n){e.push({name:t,value:n})},arguments),e},reqwest.serialize=function(){if(arguments.length===0)return"";var e,t,n=Array.prototype.slice.call(arguments,0);return e=n.pop(),e&&e.nodeType&&n.push(e)&&(e=null),e&&(e=e.type),e=="map"?t=serializeHash:e=="array"?t=reqwest.serializeArray:t=serializeQueryString,t.apply(null,n)},reqwest.toQueryString=function(e,t){var n,r,i=t||!1,s=[],o=encodeURIComponent,u=function(e,t){t="function"==typeof t?t():t==null?"":t,s[s.length]=o(e)+"="+o(t)};if(isArray(e))for(r=0;e&&r<e.length;r++)u(e[r].name,e[r].value);else for(n in e)e.hasOwnProperty(n)&&buildParams(n,e[n],i,u);return s.join("&").replace(/%20/g,"+")},reqwest.getcallbackPrefix=function(){return callbackPrefix},reqwest.compat=function(e,t){return e&&(e.type&&(e.method=e.type)&&delete e.type,e.dataType&&(e.type=e.dataType),e.jsonpCallback&&(e.jsonpCallbackName=e.jsonpCallback)&&delete e.jsonpCallback,e.jsonp&&(e.jsonpCallback=e.jsonp)),new Reqwest(e,t)},reqwest.ajaxSetup=function(e){e=e||{};for(var t in e)globalSetupOptions[t]=e[t]},reqwest})
+},{}],8:[function(require,module,exports){
 'use strict';
 
 var reqwest = require('reqwest');
 var Delegate = require("./bower_components/dom-delegate/lib/delegate.js");
 var header = document.querySelector('.o-header');
+var myFt = document.querySelector('.o-header__secondary--myft-js')
 var defaultPanel = header.getAttribute('data-default-panel');
 var delegate = new Delegate(header);
 var bodyDelegate = new Delegate();
+var nextUserPreferences = require("./bower_components/next-user-preferences/src/main.js");
 
 delegate.on('click', '.o-header-button-js', function(event) {
 	event.preventDefault();
@@ -1102,4 +1574,6 @@ reqwest('http://next-companies-et-al.herokuapp.com/v1/ubernav.json', function(re
 		+ '</ul>';
 });
 
-},{"./bower_components/dom-delegate/lib/delegate.js":2,"reqwest":1}]},{},[3])
+if (myFt) nextUserPreferences.init(myFt);
+
+},{"./bower_components/dom-delegate/lib/delegate.js":2,"./bower_components/next-user-preferences/src/main.js":6,"reqwest":1}]},{},[8])

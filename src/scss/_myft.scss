@@ -1,0 +1,26 @@
+// Don't look in this file, it's really hacky :(
+.myft {
+	font-size: 14px;
+}
+.myft,
+.myft ul,
+.myft li {
+	list-style: none;
+	text-align: left;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.myft__title {
+	font-weight: bold;
+	padding: 4px 0 4px 0;
+	height: 28px;
+}
+
+.myft a {
+	display: block;
+	color: #333;
+	text-decoration: none;
+	height: 28px;
+}

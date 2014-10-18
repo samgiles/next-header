@@ -1574,6 +1574,6 @@ reqwest('http://next-companies-et-al.herokuapp.com/v1/ubernav.json', function(re
 		+ '</ul>';
 });
 
-if (myFt) nextUserPreferences.init(myFt);
+if (myFt) nextUserPreferences.init(myFt, { notify: true });
 
 },{"./bower_components/dom-delegate/lib/delegate.js":2,"./bower_components/next-user-preferences/src/main.js":6,"reqwest":1}]},{},[8])

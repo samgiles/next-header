@@ -45,6 +45,25 @@ bodyDelegate.on('click', function(event) {
 	}
 });
 
+document.addEventListener('notifications:new', function(e) {
+	var total = 0, 
+			notifications = e.detail,
+			myFTButton = header.querySelector('.o-header-button-js[data-target-panel="myft"]');
+	for(var stream in notifications) {
+		if(notifications[stream]) {
+			total += notifications[stream].length;
+		}
+	}
+	if(total > 0) {
+		if(myFTButton.getElementsByClassName('notify-badge').length) {
+			myFTButton.getElementsByClassName('notify-badge')[0].textContent = total;
+		} else {
+			myFTButton.insertAdjacentHTML('beforeend', '<span class="notify-badge">'+total + '</span>')
+
+		}
+	}
+});
+
 reqwest('http://next-companies-et-al.herokuapp.com/v1/ubernav.json', function(resp) {
 	var data = resp.data;
 	header.querySelector('.o-header__secondary--menu-js').innerHTML = '<ul class="uber-index">'

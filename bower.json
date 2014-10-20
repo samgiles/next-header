@@ -8,7 +8,7 @@
     "o-ft-forms": "~0.10.0",
     "dom-delegate": "~2.0.3",
     "superagent": "~0.18.0",
-    "next-user-preferences": "https://github.com/Financial-Times/next-user-preferences.git#js-component"
+    "next-user-preferences": "https://github.com/Financial-Times/next-user-preferences.git#v1.0.1"
   },
   "main": [
     "main.scss",

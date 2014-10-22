@@ -7,6 +7,7 @@ var myFt = document.querySelector('.o-header__secondary--myft-js')
 var defaultPanel = header.getAttribute('data-default-panel');
 var delegate = new Delegate(header);
 var bodyDelegate = new Delegate();
+var Notify = require('./src/js/Notify');
 var nextUserPreferences = require('next-user-preferences');
 
 delegate.on('click', '.o-header-button-js', function(event) {
@@ -45,7 +46,7 @@ bodyDelegate.on('click', function(event) {
 	}
 });
 
-document.addEventListener('notifications:new', function(e) {
+document.addEventListener('notifications:load', function(e) {
 	var total = 0, 
 			notifications = e.detail,
 			myFTButton = header.querySelector('.o-header-button-js[data-target-panel="myft"]');
@@ -59,9 +60,23 @@ document.addEventListener('notifications:new', function(e) {
 			myFTButton.getElementsByClassName('notify-badge')[0].textContent = total;
 		} else {
 			myFTButton.insertAdjacentHTML('beforeend', '<span class="notify-badge">'+total + '</span>')
-
 		}
 	}
+});
+
+document.addEventListener('notifications:new', function(e) {
+	var total = 0, 
+			data = e.detail,
+			myFTButton = header.querySelector('.o-header-button-js[data-target-panel="myft"]');
+	
+	new Notify({
+		title: 'New article in ' + data.stream.displayText,
+		body: 'This is where the headline would go',
+		lifespan: 1000 * 120,
+		onclick: function() {
+			location.href = '/' + data.notifications[0].item
+		}
+	}).show();
 });
 
 reqwest('http://next-companies-et-al.herokuapp.com/v1/ubernav.json', function(resp) {

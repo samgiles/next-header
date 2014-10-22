@@ -19,6 +19,7 @@ $o-ft-forms-is-silent: false;
 @import "src/scss/secondary";
 @import "src/scss/uber-index";
 @import "src/scss/myft";
+@import "src/scss/notify";
 @import "next-user-preferences/src/styles";
 
 @include oFtIconsFontFace();
@@ -36,6 +37,9 @@ $o-ft-forms-is-silent: false;
 
 .icon__myft {
 	@extend %o-ft-icons-icon--profile;
+}
+.icon__close {
+	@extend %o-ft-icons-icon--cross;
 }
 
 // HACK

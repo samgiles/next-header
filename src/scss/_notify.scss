@@ -1,0 +1,32 @@
+.message__container {
+    padding: 20px;
+    background-color: #ccc;
+    display: inline-block;
+    font-family: Benton Sans, Helvetica, Arial;
+    border-radius: 2px;
+    box-shadow: 1px 1px 2px 1px #666;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    z-index: 2;
+}
+
+.message__close {
+    content: 'x';
+    position: absolute;
+    right: 0;
+    top: 0;
+    cursor: pointer;
+    padding: 5px;
+    &:hover {
+        color: #fff;
+    }
+}
+
+.message__title {
+    margin: 0 0 10px 0;
+}
+
+.message__body {
+    text-decoration: none;
+}

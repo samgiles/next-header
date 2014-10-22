@@ -1,0 +1,18 @@
+[data-target-panel="myft"] {
+    
+    transition: background-color 0.7s;
+    transition-delay: 0.5s;
+
+    &.myft--add-favourite,
+    &.myft--remove-favourite {
+        transition: none;
+    }
+
+    &.myft--add-favourite {
+        background-color: rgba(0,255,0, 0.6);
+    }
+
+    &.myft--remove-favourite {
+        background-color: rgba(255,0,0, 0.6);
+    }
+}

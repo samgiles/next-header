@@ -905,6 +905,12 @@ html {
   background: #DDDDDD;
   color: #000000; }
 
+[data-target-panel="myft"] .icon::before {
+  content: '\2605';
+  display: inline-block;
+  font-family: BentonSans, Arial, sans-serif;
+  font-size: 20px; }
+
 .o-header__primary {
   display: table;
   width: 100%;
@@ -1005,6 +1011,16 @@ html {
 
 .message__body {
   text-decoration: none; }
+
+[data-target-panel="myft"] {
+  transition: background-color 0.7s;
+  transition-delay: 0.5s; }
+  [data-target-panel="myft"].myft--add-favourite, [data-target-panel="myft"].myft--remove-favourite {
+    transition: none; }
+  [data-target-panel="myft"].myft--add-favourite {
+    background-color: rgba(0, 255, 0, 0.6); }
+  [data-target-panel="myft"].myft--remove-favourite {
+    background-color: rgba(255, 0, 0, 0.6); }
 
 .notify-badge {
   margin-left: 10px;

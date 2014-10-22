@@ -97,16 +97,29 @@ document.addEventListener('notifications:new', function(e) {
 
 });
 
-document.addEventListener('favourites:add', function (e) {
-	myFTButton.classList.add('myft--add-favourite');
+
+
+function transitionMyFTButton (type) {
+
+	function listener() {
+		myFTButton.classList.remove('transitioning');
+		myFTButton.removeEventListener('transitionend', listener);
+	};
+
+	myFTButton.addEventListener('transitionend', listener);
+	myFTButton.classList.add('transitioning');
+	myFTButton.classList.add('myft--' + type);
 	myFTButton.offsetWidth; //forces repaint
-	myFTButton.classList.remove('myft--add-favourite');
+
+	myFTButton.classList.remove('myft--' + type);
+}
+
+document.addEventListener('favourites:add', function (e) {
+	transitionMyFTButton('add-favourite');
 });
 
 document.addEventListener('favourites:remove', function (e) {
-	myFTButton.classList.add('myft--remove-favourite');
-	myFTButton.offsetWidth; //forces repaint
-	myFTButton.classList.remove('myft--remove-favourite');
+	transitionMyFTButton('remove-favourite');
 });
 
 reqwest('http://next-companies-et-al.herokuapp.com/v1/ubernav.json', function(resp) {

@@ -69,14 +69,33 @@ document.addEventListener('notifications:new', function(e) {
 			data = e.detail,
 			myFTButton = header.querySelector('.o-header-button-js[data-target-panel="myft"]');
 	
-	new Notify({
-		title: 'New article in ' + data.stream.displayText,
-		body: 'This is where the headline would go',
-		lifespan: 1000 * 120,
-		onclick: function() {
-			location.href = '/' + data.notifications[0].item
+	var id = data.notifications[0].item;
+	reqwest({
+		url: '/' + id,
+		headers: {
+			'Content-Type': 'application/json',
+			'Accept': 'application/json'
 		}
-	}).show();
+	}).then(function(res) {
+		new Notify({
+			title: 'New article in ' + data.stream.displayText,
+			body: res.headline,
+			lifespan: 1000 * 10,
+			onclick: function() {
+				location.href = '/' + res.id
+			}
+		}).show();
+	}).fail(function(err) {
+		new Notify({
+			title: 'New article in ' + data.stream.displayText,
+			lifespan: 1000 * 10,
+			onclick: function() {
+				location.href = '/' + data.notifications[0].item
+			}
+		}).show();
+	});
+
+
 });
 
 reqwest('http://next-companies-et-al.herokuapp.com/v1/ubernav.json', function(resp) {

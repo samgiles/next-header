@@ -3,7 +3,8 @@
 var reqwest = require('reqwest');
 var Delegate = require('dom-delegate');
 var header = document.querySelector('.o-header');
-var myFt = document.querySelector('.o-header__secondary--myft-js')
+var myFt = document.querySelector('.o-header__secondary--myft-js');
+var myFTButton = header.querySelector('.o-header-button-js[data-target-panel="myft"]');
 var defaultPanel = header.getAttribute('data-default-panel');
 var delegate = new Delegate(header);
 var bodyDelegate = new Delegate();
@@ -48,8 +49,7 @@ bodyDelegate.on('click', function(event) {
 
 document.addEventListener('notifications:load', function(e) {
 	var total = 0, 
-			notifications = e.detail,
-			myFTButton = header.querySelector('.o-header-button-js[data-target-panel="myft"]');
+			notifications = e.detail;
 	for(var stream in notifications) {
 		if(notifications[stream]) {
 			total += notifications[stream].length;
@@ -66,8 +66,7 @@ document.addEventListener('notifications:load', function(e) {
 
 document.addEventListener('notifications:new', function(e) {
 	var total = 0, 
-			data = e.detail,
-			myFTButton = header.querySelector('.o-header-button-js[data-target-panel="myft"]');
+			data = e.detail;
 	
 	new Notify({
 		title: 'New article in ' + data.stream.displayText,
@@ -77,6 +76,18 @@ document.addEventListener('notifications:new', function(e) {
 			location.href = '/' + data.notifications[0].item
 		}
 	}).show();
+});
+
+document.addEventListener('favourites:add', function (e) {
+	myFTButton.classList.add('myft--add-favourite');
+	myFTButton.offsetWidth; //forces repaint
+	myFTButton.classList.remove('myft--add-favourite');
+});
+
+document.addEventListener('favourites:remove', function (e) {
+	myFTButton.classList.add('myft--remove-favourite');
+	myFTButton.offsetWidth; //forces repaint
+	myFTButton.classList.remove('myft--remove-favourite');
 });
 
 reqwest('http://next-companies-et-al.herokuapp.com/v1/ubernav.json', function(resp) {
@@ -95,4 +106,4 @@ reqwest('http://next-companies-et-al.herokuapp.com/v1/ubernav.json', function(re
 		+ '</ul>';
 });
 
-if (myFt) nextUserPreferences.init(myFt, { notify: true });
+//if (myFt) nextUserPreferences.init(myFt, { notify: true });

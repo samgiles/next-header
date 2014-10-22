@@ -20,6 +20,7 @@ $o-ft-forms-is-silent: false;
 @import "src/scss/uber-index";
 @import "src/scss/myft";
 @import "src/scss/notify";
+@import "src/scss/favouriting";
 @import "next-user-preferences/src/styles";
 
 @include oFtIconsFontFace();

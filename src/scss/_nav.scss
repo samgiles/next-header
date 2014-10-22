@@ -33,3 +33,14 @@
 	background: #DDDDDD;
 	color: #000000;
 }
+
+// o-ft-icons doesn't have a star icon so reverting to the old Benton sans icon set
+[data-target-panel="myft"] .icon {
+    
+    &::before {
+        content: '\2605';
+        display: inline-block;
+        font-family: BentonSans, Arial, sans-serif;
+        font-size: 20px;
+    }
+}

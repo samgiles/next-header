@@ -8,6 +8,11 @@
 	display: none;
 }
 
+@media screen and (max-width: 600px) {
+	.o-header__secondary {
+		padding: 4px 8px;
+	}
+}
 .o-header__secondary--search {
 	.o-header[data-panel=search] & {
 		display: block;	

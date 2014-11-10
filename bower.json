@@ -9,7 +9,8 @@
     "dom-delegate": "~2.0.3",
     "superagent": "~0.18.0",
     "reqwest": "~1.1.4",
-    "next-user-preferences": "https://github.com/Financial-Times/next-user-preferences.git#v1.0.3"
+    "next-user-preferences": "https://github.com/Financial-Times/next-user-preferences.git#v1.0.4",
+    "next-user-model-component": "https://github.com/Financial-Times/next-user-model-component.git#v0.0.3"
   },
   "main": [
     "main.scss",

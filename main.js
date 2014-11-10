@@ -4,12 +4,13 @@ var reqwest = require('reqwest');
 var Delegate = require('dom-delegate');
 var header = document.querySelector('.o-header');
 var myFt = document.querySelector('.o-header__secondary--myft-js');
-var myFTButton = header.querySelector('.o-header-button-js[data-target-panel="myft"]');
+var myFTButton = header.querySelector('.o-header-button[data-target-panel="myft"]');
 var defaultPanel = header.getAttribute('data-default-panel');
 var delegate = new Delegate(header);
 var bodyDelegate = new Delegate();
 var Notify = require('./src/js/Notify');
 var nextUserPreferences = require('next-user-preferences');
+var User = require('next-user-model-component');
 
 delegate.on('click', '.o-header-button-js', function(event) {
 	event.preventDefault();
@@ -47,26 +48,23 @@ bodyDelegate.on('click', function(event) {
 	}
 });
 
+
+// Listen for the notification poller to report the number of new items
 document.addEventListener('notifications:load', function(e) {
-	var total = 0, 
-			notifications = e.detail;
-	for(var stream in notifications) {
-		if(notifications[stream]) {
-			total += notifications[stream].length;
-		}
-	}
-	if(total > 0) {
-		if(myFTButton.getElementsByClassName('notify-badge').length) {
-			myFTButton.getElementsByClassName('notify-badge')[0].textContent = total;
-		} else {
-			myFTButton.insertAdjacentHTML('beforeend', '<span class="notify-badge">'+total + '</span>')
-		}
-	}
+    var total = 0, 
+        notifications = e.detail;
+		
+    if(myFTButton.getElementsByClassName('notify-badge').length) {
+        myFTButton.getElementsByClassName('notify-badge')[0].textContent = notifications.count;
+    } else {
+        myFTButton.insertAdjacentHTML('beforeend', '<span class="notify-badge">'+total + '</span>')
+    }
+	
 });
 
 document.addEventListener('notifications:new', function(e) {
 	var total = 0, 
-			data = e.detail;
+	    data = e.detail;
 	
 	var id = data.notifications[0].item;
 	reqwest({
@@ -97,7 +95,14 @@ document.addEventListener('notifications:new', function(e) {
 
 });
 
-
+// Make the follow button visible  
+function setFollowingButton () {
+    var uid = new User(document.cookie).id();
+    if (uid) {
+	    myFTButton.setAttribute('href', '/users/' + uid + '/following/new');
+	    myFTButton.textContent = 'Following';
+    }
+}
 
 function transitionMyFTButton (type) {
 
@@ -137,5 +142,7 @@ reqwest('http://next-companies-et-al.herokuapp.com/v1/ubernav.json', function(re
 		}).join('');
 		+ '</ul>';
 });
+
+setFollowingButton();
 
 if (myFt) nextUserPreferences.init(myFt, { notify: true });

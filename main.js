@@ -144,5 +144,3 @@ reqwest('http://next-companies-et-al.herokuapp.com/v1/ubernav.json', function(re
 });
 
 setFollowingButton();
-
-if (myFt) nextUserPreferences.init(myFt, { notify: true });

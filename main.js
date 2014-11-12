@@ -88,12 +88,12 @@ document.addEventListener('notifications:new', function(e) {
 
 // Make the follow button visible  
 function setFollowingButton () {
-    var uid = new User(document.cookie).id();
-    if (uid) {
-	myFtButton.setAttribute('href', '/users/' + uid + '/following/new');
-	myFtButton.textContent = 'Following';
-        myFtButton.insertAdjacentHTML('beforeend', '<span class="notify-badge"></span>');
-    }
+	var uid = new User(document.cookie).id();
+	if (uid) {
+		myFtButton.setAttribute('href', '/users/' + uid + '/following/new');
+		myFtButton.textContent = 'Following';
+		myFtButton.insertAdjacentHTML('beforeend', '<span class="notify-badge"></span>');
+	}
 }
 
 function transitionMyFtButton (type) {

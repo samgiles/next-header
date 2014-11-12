@@ -3,13 +3,12 @@
 var reqwest = require('reqwest');
 var Delegate = require('dom-delegate');
 var header = document.querySelector('.o-header');
-var myFt = document.querySelector('.o-header__secondary--myft-js');
-var myFTButton = header.querySelector('.o-header-button[data-target-panel="myft"]');
+var myFtButton = header.querySelector('.o-header-button-js[data-target-panel="myft"]');
 var defaultPanel = header.getAttribute('data-default-panel');
 var delegate = new Delegate(header);
 var bodyDelegate = new Delegate();
 var Notify = require('./src/js/Notify');
-var nextUserPreferences = require('next-user-preferences');
+require('next-user-preferences');
 var User = require('next-user-model-component');
 
 delegate.on('click', '.o-header-button-js', function(event) {
@@ -56,8 +55,7 @@ document.addEventListener('notifications:load', function(e) {
 });
 
 document.addEventListener('notifications:new', function(e) {
-	var total = 0, 
-	    data = e.detail;
+	var data = e.detail;
 	
 	var id = data.notifications[0].item;
 	reqwest({
@@ -72,7 +70,7 @@ document.addEventListener('notifications:new', function(e) {
 			body: res.headline,
 			lifespan: 1000 * 10,
 			onclick: function() {
-				location.href = '/' + res.id
+				location.href = '/' + res.id;
 			}
 		}).show();
 	}).fail(function(err) {
@@ -80,7 +78,7 @@ document.addEventListener('notifications:new', function(e) {
 			title: 'New article in ' + data.stream.displayText,
 			lifespan: 1000 * 10,
 			onclick: function() {
-				location.href = '/' + data.notifications[0].item
+				location.href = '/' + data.notifications[0].item;
 			}
 		}).show();
 	});
@@ -92,33 +90,33 @@ document.addEventListener('notifications:new', function(e) {
 function setFollowingButton () {
     var uid = new User(document.cookie).id();
     if (uid) {
-	    myFTButton.setAttribute('href', '/users/' + uid + '/following/new');
-	    myFTButton.textContent = 'Following';
-        myFTButton.insertAdjacentHTML('beforeend', '<span class="notify-badge"></span>')
+	myFtButton.setAttribute('href', '/users/' + uid + '/following/new');
+	myFtButton.textContent = 'Following';
+        myFtButton.insertAdjacentHTML('beforeend', '<span class="notify-badge"></span>');
     }
 }
 
-function transitionMyFTButton (type) {
+function transitionMyFtButton (type) {
 
 	function listener() {
-		myFTButton.classList.remove('transitioning');
-		myFTButton.removeEventListener('transitionend', listener);
-	};
+		myFtButton.classList.remove('transitioning');
+		myFtButton.removeEventListener('transitionend', listener);
+	}
 
-	myFTButton.addEventListener('transitionend', listener);
-	myFTButton.classList.add('transitioning');
-	myFTButton.classList.add('myft--' + type);
-	myFTButton.offsetWidth; //forces repaint
+	myFtButton.addEventListener('transitionend', listener);
+	myFtButton.classList.add('transitioning');
+	myFtButton.classList.add('myft--' + type);
+	myFtButton.offsetWidth; //forces repaint
 
-	myFTButton.classList.remove('myft--' + type);
+	myFtButton.classList.remove('myft--' + type);
 }
 
 document.addEventListener('favourites:add', function (e) {
-	transitionMyFTButton('add-favourite');
+	transitionMyFtButton('add-favourite');
 });
 
 document.addEventListener('favourites:remove', function (e) {
-	transitionMyFTButton('remove-favourite');
+	transitionMyFtButton('remove-favourite');
 });
 
 reqwest('http://next-companies-et-al.herokuapp.com/v1/ubernav.json', function(resp) {

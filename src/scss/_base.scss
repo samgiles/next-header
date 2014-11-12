@@ -11,6 +11,8 @@
 	@extend %o-grid-row;
 	@extend %o-grid-col;
 	@extend %o-grid-colspan-12;
+	padding-left: 0;
+	padding-right: 0;
 }
 
 .o-header__container--primary {

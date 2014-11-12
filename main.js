@@ -3,7 +3,7 @@
 var reqwest = require('reqwest');
 var Delegate = require('dom-delegate');
 var header = document.querySelector('.o-header');
-var myFtButton = header.querySelector('.o-header-button-js[data-target-panel="myft"]');
+var myFtButton = header.querySelector('.o-header-button[data-target-panel="myft"]');
 var defaultPanel = header.getAttribute('data-default-panel');
 var delegate = new Delegate(header);
 var bodyDelegate = new Delegate();

@@ -137,7 +137,7 @@ data = splitArray(splitArray(data, 4), 2);
 
 header.querySelector('.o-header__secondary--menu-js').innerHTML = '<ul class="uber-index">'
 	+ data.map(function(item) {
-		return '<ul data-o-grid-colspan="6 M6 L6 XL6">'
+		return '<ul data-o-grid-colspan="12 M12 L6 XL6">'
 			+ item.map(function(item) {
 				return '<ul data-o-grid-colspan="12 M12 L6 XL6">'
 					+ item.map(function(item) {

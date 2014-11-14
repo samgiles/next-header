@@ -30,15 +30,3 @@
 .message__body {
     text-decoration: none;
 }
-
-.notify-badge {
-    margin-left: 10px;
-    background-color: red;
-    padding: 5px;
-    border-radius: 5px;
-    color: white;
-    font-family: BentonSans, Helvetica, Arial;
-    &[aria-hidden] {
-        display: none;
-    }
-}

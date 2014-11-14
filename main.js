@@ -50,8 +50,10 @@ bodyDelegate.on('click', function(event) {
 
 // Listen for the notification poller to report the number of new items
 document.addEventListener('notifications:load', function(e) {
-    var notifications = e.detail;
-    document.querySelector('.notify-badge').textContent = notifications.count;
+	var notifications = e.detail;
+	if (parseInt(notifications.count, 10) > 0) {
+		document.querySelector('.notify-badge').textContent = "("+notifications.count+")";
+	}
 });
 
 document.addEventListener('notifications:new', function(e) {
@@ -92,7 +94,7 @@ function setFollowingButton () {
 	if (uid) {
 		myFtButton.setAttribute('href', '/users/' + uid + '/following/new');
 		myFtButton.textContent = 'Following';
-		myFtButton.insertAdjacentHTML('beforeend', '<span class="notify-badge"></span>');
+		myFtButton.insertAdjacentHTML('beforeend', ' <span class="notify-badge"></span>');
 	}
 }
 

@@ -10,8 +10,8 @@
 }
 
 .uber-index__title {
-	padding: 10px 0 10px 0;
 	font-weight: bold;
+	border-bottom: 1px solid oColorsGetPaletteColor(pink-tint3);
 }
 
 .uber-index__children {
@@ -21,12 +21,20 @@
 
 .uber-index__child {
 	font-weight: normal;
+	border-top: 1px solid oColorsGetPaletteColor(grey-tint4);
 }
 
 .uber-index a {
-	color: #333333;
 	text-decoration: none;
 	display: block;
-	height: 28px;
+	height: 41px;
+	color: oColorsGetPaletteColor(white);
+	font-size: 16px;
+	line-height: 35px;
+	padding: 3px 0 3px 0;
+}
+
+.uber-index__child a {
+	color: oColorsGetPaletteColor(pink-tint3);
 	font-size: 14px;
 }

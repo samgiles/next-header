@@ -1,10 +1,9 @@
 .o-header__container--secondary {
-	background: #DDDDDD;
+	background: oColorsGetPaletteColor(grey-tint5);
 }
 
 .o-header__secondary {
 	text-align: center;
-	padding: 4px 4px 4px 68px;
 	display: none;
 }
 

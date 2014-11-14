@@ -907,8 +907,8 @@ html {
 .o-header[data-panel=search] [data-target-panel=search],
 .o-header[data-panel=myft] [data-target-panel=myft],
 .o-header[data-panel=menu] [data-target-panel=menu] {
-  background: #DDDDDD;
-  color: #000000; }
+  background: #333333;
+  color: white; }
 
 [data-target-panel="myft"] .icon::before {
   content: '\2605';
@@ -941,6 +941,9 @@ html {
 
 .o-header[data-panel=menu] .o-header__secondary--menu {
   display: block; }
+
+.o-header__secondary--search {
+  padding: 4px; }
 
 .uber-index {
   margin: 0;

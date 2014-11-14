@@ -893,7 +893,7 @@ html {
   .o-header__nav li {
     display: inline-block; }
   .o-header__nav i {
-    margin-right: 4px; }
+    margin-left: 4px; }
   .o-header__nav a {
     color: #FFFFFF;
     text-decoration: none;

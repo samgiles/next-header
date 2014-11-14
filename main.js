@@ -121,17 +121,38 @@ document.addEventListener('favourites:remove', function (e) {
 
 reqwest('http://next-companies-et-al.herokuapp.com/v1/ubernav.json', function(resp) {
 	var data = resp.data;
+
+	function splitArray(arr, by) {
+		return arr.reduce(function(out, value, index) {
+			var column = index % by;
+			out[column] = out[column] || [];
+			out[column].push(value);
+			return out;
+		},[]);
+	}
+
+	// Split the data into four columns, and again into 2
+	data = splitArray(splitArray(data, 4), 2);
+
 	header.querySelector('.o-header__secondary--menu-js').innerHTML = '<ul class="uber-index">'
 		+ data.map(function(item) {
-		return '<li class="uber-index__title" data-o-grid-colspan="6 M6 L3 XL3">'
-			+ '<a href="' + item.nextUrl + '">' + item.title + '</a>'
-			+ '<ul class="uber-index__children">'
-			+ item.navigationItems.map(function(child) {
-				return '<li class="uber-index__child"><a href="' + child.nextUrl + '">' + child.title + '</a></li>';
-			}).join('')
-			+ '</ul>'
-			+ '</li>';
-		}).join('');
+			return '<ul data-o-grid-colspan="6 M6 L6 XL6">'
+				+ item.map(function(item) {
+					return '<ul data-o-grid-colspan="12 M12 L6 XL6">'
+						+ item.map(function(item) {
+							return '<li class="uber-index__title">'
+								+ '<a href="' + item.nextUrl + '">' + item.title + '</a>'
+								+ '<ul class="uber-index__children">'
+								+ item.navigationItems.map(function(child) {
+									return '<li class="uber-index__child"><a href="' + child.nextUrl + '">' + child.title + '</a></li>';
+								}).join('')
+								+ '</ul>'
+								+ '</li>';
+						}).join('')
+						+ '</ul>';
+				}).join('')
+				+ '</ul>';
+		}).join('')
 		+ '</ul>';
 });
 

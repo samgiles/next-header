@@ -942,6 +942,9 @@ html {
 .o-header[data-panel=menu] .o-header__secondary--menu {
   display: block; }
 
+.o-header__secondary--search {
+  padding: 4px; }
+
 .uber-index {
   margin: 0;
   padding: 0;

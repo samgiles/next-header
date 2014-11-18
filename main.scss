@@ -1,7 +1,7 @@
 @import "o-assets/main";
 
 @include oAssetsSetModulePaths((
-	o-ft-icons: '//build.origami.ft.com/files/o-ft-icons'
+	o-ft-icons: '//build.origami.ft.com/files/o-ft-icons@2.2.3'
 ));
 
 @import "o-fonts/main";

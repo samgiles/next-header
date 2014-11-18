@@ -3,7 +3,7 @@
   "dependencies": {
     "o-fonts": "~1.4.2",
     "o-grid": "~2.2.0",
-    "o-ft-icons": "~2.2.3",
+    "o-ft-icons": "2.2.3",
     "o-assets": "~0.4.5",
     "o-ft-forms": "~0.10.0",
     "dom-delegate": "~2.0.3",
